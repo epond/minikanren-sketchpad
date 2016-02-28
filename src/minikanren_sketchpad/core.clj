@@ -63,16 +63,15 @@
                                  (turingo p y)
                                  (== q [p  y])))))
 
-  ; conde succeeds for every goal that succeeds independently
-  (println (run* [q]
+  (println "conde succeeds for every goal that succeeds independently"
+           (run* [q]
                  (conde
                    [(== q 1)]
                    [(== q 2) (== q 3)]
                    [(== q :abc)])))
-  ; conso relates the head and tail of a list to the whole list
-  (println (run* [q] (conso :a [:b :c] q)))
+  (println "conso relates the head and tail of a list to the whole list"
+           (run* [q] (conso :a [:b :c] q)))
 
-  ; insideo is equivalent to the built-in membero
   (defn insideo [e l]
     (conde
       [(fresh [h t]
@@ -82,8 +81,23 @@
               (conso h t l)
               (insideo e t))]
       ))
-  (println (run* [q] (insideo q [:a :b :c])))
-  (println (run* [q] (insideo :d [:a :b :c q])))
+  (println "insideo is equivalent to the built-in membero"
+           (run* [q] (insideo q [:a :b :c])))
+  (println "and can also be run backwards"
+           (run* [q] (insideo :d [:a :b :c q])))
 
+
+  ; ========================================
+  ; Day 2: Mixing the Logical and Functional
+  ; ========================================
+
+  (defn matchinsideo [e l]
+    (matche [l]
+            ([[e . _]])
+            ([[_ . t]] (matchinsideo e t))))                ; matche automatically creates fresh logic variables
+  (println "matche lets us write insideo more concisely"
+           (run* [q] (matchinsideo q [:a :b :c])))
+  (println "and here it is working backwards"
+           (run* [q] (insideo :d [:a :b :c q])))
 
   )
