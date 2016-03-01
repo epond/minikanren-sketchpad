@@ -1,7 +1,8 @@
 (ns minikanren-sketchpad.core
   (:refer-clojure :exclude [==])
   (:use clojure.core.logic
-        clojure.core.logic.pldb))
+        clojure.core.logic.pldb)
+  (:require [clojure.core.logic.fd :as fd]))
 
 (defn -main [& args]
 
@@ -151,4 +152,25 @@
               (conduinsideo e t))]
       ))
   (println "condu only makes the first committed choice" (run* [q] (conduinsideo q [:a :b :c :d])))
+
+
+  ; =================================
+  ; Day 3: Writing Stories with Logic
+  ; =================================
+
+  (println "What numbers are <= 1, restricting the search to a finite domain?"
+           (run* [q]
+                 (fd/in q (fd/interval 0 10))
+                 (fd/<= q 1)))
+
+  (println "What three numbers add up to 10?"
+           (run* [q]
+                (fresh [x y z]
+                       (== q [x y z])
+                       (fd/in x y z (fd/interval 1 10))
+                       (fd/distinct [x y z])
+                       (fd/< x y)
+                       (fd/< y z)
+                       (fd/eq
+                         (= (+ x y z) 10)))))
   )
