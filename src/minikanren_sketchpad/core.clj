@@ -100,4 +100,55 @@
   (println "and here it is working backwards"
            (run* [q] (insideo :d [:a :b :c q])))
 
+  (defne defneinsideo [e l]
+         ([_ [e . _]])
+         ([_ [_ . t]] (defneinsideo e t)))
+  (println "defne defines a function that uses patterns on its input arguments"
+           (run* [q] (defneinsideo q [:a :b :c])))
+
+  (println "core.logic map patterns must match exactly"
+           (run* [q]
+                 (fresh [m]
+                        (== m {:a 1 :b 2})
+                        (matche [m]
+                                ([{:a 1}] (== q :found-a))
+                                ([{:b 2}] (== q :found-b))
+                                ([{:a 1 :b 2}] (== q :found-a-and-b))))))
+
+  (println "We can use conde and featurec to include all branches in the solution"
+           (run* [q]
+                 (fresh [m a b]
+                        (== m {:a 1 :b 2})
+                        (conde
+                                [(featurec m {:a a}) (== q [:found-a a])]
+                                [(featurec m {:b b}) (== q [:found-b b])]
+                                [(featurec m {:a a :b b}) (== q [:found-a-and-b a b])]))))
+
+  (println "conda only looks for solutions in the first branch that has a successful first goal")
+  (defn whicho [x s1 s2 r]
+           (conda
+                 [(all
+                    (membero x s1)
+                    (membero x s2)
+                    (== r :both))]
+                 [(all
+                    (membero x s1)
+                    (== r :one))]
+                 [(all
+                    (membero x s2)
+                    (== r :two))]))
+  (println (run* [q] (whicho :a [:a :b :c] [:d :e :c] q)))
+  (println (run* [q] (whicho :d [:a :b :c] [:d :e :c] q)))
+  (println (run* [q] (whicho :c [:a :b :c] [:d :e :c] q)))
+
+  (defn conduinsideo [e l]
+    (condu
+      [(fresh [h t]
+              (conso h t l)
+              (== h e))]
+      [(fresh [h t]
+              (conso h t l)
+              (conduinsideo e t))]
+      ))
+  (println "condu only makes the first committed choice" (run* [q] (conduinsideo q [:a :b :c :d])))
   )
