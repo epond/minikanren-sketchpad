@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [==])
   (:use clojure.core.logic
         clojure.core.logic.pldb)
-  (:require [clojure.core.logic.fd :as fd]))
+  (:require [clojure.core.logic.fd :as fd])
+  (:require [logical.story :as story]))
 
 (defn -main [& args]
 
@@ -173,4 +174,11 @@
                        (fd/< y z)
                        (fd/eq
                          (= (+ x y z) 10)))))
+
+  (println "What actions are possible given a starting state of a motorist?"
+           (with-db story/story-db
+                    (run* [q]
+                          (fresh [action state]
+                                 (== q [action state])
+                                 (story/actiono [:motorist] state action)))))
   )
