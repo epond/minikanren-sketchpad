@@ -193,4 +193,14 @@
                    (story/storyo [:guilty-scarlet] q))))
   (println "Give me a story where Miss Scarlett is guilty")
   (story/print-story (first (drop 10 scarlettstories)))
+
+  (defn story-stream [& goals]
+    (with-db story/story-db
+             (run* [q]
+                   (story/storyo (vec goals) q))))
+  (println "Give me a story with more than 10 elements in which Yvette dies and Mrs. Peacock is a murderer")
+  (story/print-story
+    (first
+      (filter #(> (count %) 10)
+              (story-stream :guilty-peacock :dead-yvette))))
   )
