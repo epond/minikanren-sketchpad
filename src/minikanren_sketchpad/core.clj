@@ -181,4 +181,16 @@
                           (fresh [action state]
                                  (== q [action state])
                                  (story/actiono [:motorist] state action)))))
+
+  (println "Give me five stories where Wadsworth ends up dead"
+           (with-db story/story-db
+                    (run 5 [q]
+                         (story/storyo [:dead-wadsworth] q))))
+
+  (def scarlettstories
+    (with-db story/story-db
+             (run* [q]
+                   (story/storyo [:guilty-scarlet] q))))
+  (println "Give me a story where Miss Scarlett is guilty")
+  (story/print-story (first (drop 10 scarlettstories)))
   )
